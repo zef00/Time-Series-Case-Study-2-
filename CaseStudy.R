@@ -282,11 +282,28 @@ print(granger_test_cpi)
 
 
 # IRF reduced form
+
+# For ez finding of the IRFs (these are the same as below but there they are seperated per variable)
+IRF_log_diff_indpro <- irf(var_model,impulse = "log_diff_indpro", n.ahead = 24,
+                           ortho = FALSE, cumulative = FALSE, boot = TRUE, ci = 0.95,
+                           runs = 100)
+irf_values_ld_ip <- extract_varirf(IRF_log_diff_indpro) # extract all the values
+
+IRF_diff_fedfunds <- irf(var_model,impulse = "diff_fedfunds", n.ahead = 24,
+                         ortho = FALSE, cumulative = FALSE, boot = TRUE, ci = 0.95,
+                         runs = 100)
+irf_values_d_ff <- extract_varirf(IRF_diff_fedfunds)
+
+IRF_log_diff2_cpi <- irf(var_model,impulse = "log_diff2_cpi", n.ahead = 24,
+                         ortho = FALSE, cumulative = FALSE, boot = TRUE, ci = 0.95,
+                         runs = 100)
+irf_values_l2d_cpi <- extract_varirf(IRF_log_diff2_cpi)
+
 # IRF log differences INDPRO 
 IRF_log_diff_indpro <- irf(var_model,impulse = "log_diff_indpro", n.ahead = 24,
                            ortho = FALSE, cumulative = FALSE, boot = TRUE, ci = 0.95,
                            runs = 100)
-plot(IRF_log_diff_indpro)
+plot(IRF_log_diff_indpro) # can't see the axis well so need to adjust 
 irf_values_ld_ip <- extract_varirf(IRF_log_diff_indpro) # extract all the values
 
 # Make the plots of all the IRF's of INDPRO in ggplot 
@@ -449,7 +466,7 @@ transformation <- function(x){ # x is the irf values dataframe
       irf <- cbind(irf, fedfunds)
     }
     else if (i %in% c(4, 7, 10)) { # Transform for the log twice differenced CPIAUCSL
-      cpi <- exp(cumsum(cumsum(column)))
+      cpi <- exp(cumsum(c(0,cumsum(column))))
       cpi <- cpi[-26]
       irf <- cbind(irf, cpi)
     }
@@ -576,10 +593,27 @@ irf_plot_cpi <- cpi_indpro / cpi_fedfunds / cpi_cpi
 
 
 # IRF of Recursive form VAR
-# IRF log differences INDPRO 
+
+# ez access to the irfs (same as with the reduced-form var irfs)
 IRF_log_diff_indpro <- irf(var_model,impulse = "log_diff_indpro", n.ahead = 24,
                            ortho = TRUE, cumulative = FALSE, boot = TRUE, ci = 0.95,
-                           runs = 100)
+                           runs = 100) # put cumulative = T if you want levels
+irf_values_ld_ip <- extract_varirf(IRF_log_diff_indpro) # extract all the values
+
+IRF_diff_fedfunds <- irf(var_model,impulse = "diff_fedfunds", n.ahead = 24,
+                         ortho = TRUE, cumulative = FALSE, boot = TRUE, ci = 0.95,
+                         runs = 100)
+irf_values_d_ff <- extract_varirf(IRF_diff_fedfunds)
+
+IRF_log_diff2_cpi <- irf(var_model,impulse = "log_diff2_cpi", n.ahead = 24,
+                         ortho = TRUE, cumulative = FALSE, boot = TRUE, ci = 0.95,
+                         runs = 100)
+irf_values_l2d_cpi <- extract_varirf(IRF_log_diff2_cpi)
+
+# IRF log differences INDPRO
+IRF_log_diff_indpro <- irf(var_model,impulse = "log_diff_indpro", n.ahead = 24,
+                           ortho = TRUE, cumulative = FALSE, boot = TRUE, ci = 0.95,
+                           runs = 100) # put cumulative = T if you want levels
 irf_values_ld_ip <- extract_varirf(IRF_log_diff_indpro) # extract all the values
 
 # Make the plots of all the IRF's of INDPRO in ggplot 
@@ -758,7 +792,7 @@ transformation <- function(x){ # x is the irf values dataframe
     else if (i %in% c(4, 7, 10)) { # Transform for the log twice differenced CPIAUCSL
       cpi <- initial_value_cpi + 
         initial_value_cpi*exp(cumsum(c(initial_diff, initial_diff+cumsum(column))))
-      cpi <- cpi[-12]
+      cpi <- cpi[-26]
       irf <- cbind(irf, cpi)
     }
   }
