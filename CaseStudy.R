@@ -758,6 +758,9 @@ l2d_cpi_irf # The final orthogonalized IRF of log twice differenced CPIAUCSL
 
 
 # Structural VAR 
+svar_data <- data.frame(data$log_diff_indpro, data$log_diff2_cpi, data$diff_fedfunds)
+svar_data <- svar_data[-(1:2), ]
+var_model <- VAR(svar_data, p = 3, type = "const")
 svar_chol <- id.chol(var_model)
 irf_chol <- irf(svar_chol, impulse = "log_diff_indpro", n.ahead = 24)
 plot(irf_chol)
